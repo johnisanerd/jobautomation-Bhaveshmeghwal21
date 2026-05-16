@@ -94,3 +94,19 @@ export async function pollResume(jobId: string): Promise<{
   if (!res.ok) return { status: "not_generated" }
   return res.json()
 }
+
+export async function getSettings(): Promise<{ apify_key_set: boolean; apify_key_preview: string }> {
+  const res = await fetch(`${API}/settings`, { cache: "no-store" })
+  if (!res.ok) return { apify_key_set: false, apify_key_preview: "" }
+  return res.json()
+}
+
+export async function updateApifyKey(apiKey: string): Promise<{ status: string; preview: string }> {
+  const res = await fetch(`${API}/settings/apify-key`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ api_key: apiKey }),
+  })
+  if (!res.ok) throw new Error("Failed to update key")
+  return res.json()
+}

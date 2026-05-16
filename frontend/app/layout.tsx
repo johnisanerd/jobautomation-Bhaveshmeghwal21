@@ -18,6 +18,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <a href="/resumes" className="text-gray-400 hover:text-white text-sm transition-colors">
             Resumes
           </a>
+          <a href="/settings" className="text-gray-400 hover:text-white text-sm transition-colors">
+            Settings
+          </a>
         </nav>
         <main className="max-w-7xl mx-auto px-4 py-6">{children}</main>
       </body>

@@ -17,6 +17,7 @@ from typing import Any
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
+from pydantic import BaseModel
 
 import config
 import db_supabase
@@ -205,3 +206,52 @@ def list_resumes(
 @app.get("/runs")
 def list_runs(limit: int = Query(20, ge=1, le=100)) -> list[dict[str, Any]]:
     return db_supabase.get_runs(limit=limit)
+
+
+# ── Settings ──────────────────────────────────────────────────────────────────
+
+class ApifyKeyUpdate(BaseModel):
+    api_key: str
+
+
+@app.get("/settings")
+def get_settings() -> dict:
+    """Return current config state (keys masked, not exposed)."""
+    key = config.APIFY_API_KEY
+    return {
+        "apify_key_set": bool(key),
+        "apify_key_preview": f"{key[:8]}…" if len(key) > 8 else ("set" if key else ""),
+    }
+
+
+@app.post("/settings/apify-key")
+def update_apify_key(body: ApifyKeyUpdate) -> dict:
+    """Update the Apify API key at runtime and persist it to .env."""
+    new_key = body.api_key.strip()
+    if not new_key:
+        raise HTTPException(status_code=400, detail="api_key must not be empty")
+
+    # Update live process
+    os.environ["APIFY_API_KEY"] = new_key
+    config.APIFY_API_KEY = new_key
+
+    # Persist to .env so it survives container restarts
+    env_path = os.path.join(os.path.dirname(__file__), ".env")
+    try:
+        if os.path.exists(env_path):
+            lines = open(env_path).readlines()
+            updated = False
+            for i, line in enumerate(lines):
+                if line.startswith("APIFY_API_KEY="):
+                    lines[i] = f"APIFY_API_KEY={new_key}\n"
+                    updated = True
+                    break
+            if not updated:
+                lines.append(f"APIFY_API_KEY={new_key}\n")
+            with open(env_path, "w") as f:
+                f.writelines(lines)
+        logger.info("[SERVER] Apify key updated and persisted to .env")
+    except Exception as exc:
+        logger.warning(f"[SERVER] Could not persist Apify key to .env: {exc}")
+
+    return {"status": "updated", "preview": f"{new_key[:8]}…"}
