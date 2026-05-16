@@ -347,6 +347,9 @@ def _html_to_pdf(html: str, pdf_path: Path) -> bool:
     import tempfile
 
     candidates = [
+        "/usr/bin/chromium",           # Debian/Ubuntu (Docker)
+        "/usr/bin/chromium-browser",   # some Ubuntu variants
+        "/usr/bin/google-chrome",      # if Chrome is installed on Linux
         r"C:\Program Files\Google\Chrome\Application\chrome.exe",
         r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
         r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
