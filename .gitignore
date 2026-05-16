@@ -1,0 +1,50 @@
+# ── Secrets ───────────────────────────────────────────────────────────────────
+.env
+*.json.key
+pelagic-breaker-*.json
+*credentials*.json
+service-account*.json
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+
+# ── Explore data (large, regeneratable) ──────────────────────────────────────
+explore_*.json
+*_checkpoint.json
+_tmp_*.txt
+
+# ── Generated resumes / applications (large binaries) ────────────────────────
+applications/
+resumes/
+
+# ── Browser profile (saved login sessions) ───────────────────────────────────
+.browser_profile/
+
+# ── Node / Next.js ────────────────────────────────────────────────────────────
+frontend/node_modules/
+frontend/.next/
+frontend/.env.local
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+
+# ── JustHireMe (separate repo) ───────────────────────────────────────────────
+JustHireMe/
+
+# ── Claude Code internals ─────────────────────────────────────────────────────
+.claude/
+
+# ── Misc data / planning files ────────────────────────────────────────────────
+*.csv
+plan.md

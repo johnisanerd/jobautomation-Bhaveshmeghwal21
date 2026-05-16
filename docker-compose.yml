@@ -1,0 +1,25 @@
+services:
+  api:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      # Persist generated resume PDFs and explore JSON files across restarts
+      - ./applications:/app/applications
+      - ./explore_results.json:/app/explore_results.json
+      - ./explore_tier2_results.json:/app/explore_tier2_results.json
+      - ./explore_tier3_results.json:/app/explore_tier3_results.json
+      - ./explore_all_results.json:/app/explore_all_results.json
+      - ./explore_posts_results.json:/app/explore_posts_results.json
+    environment:
+      # Override SSL_NO_VERIFY for the production server (Telegram works fine without it)
+      SSL_NO_VERIFY: "false"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
