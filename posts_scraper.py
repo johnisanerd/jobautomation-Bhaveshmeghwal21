@@ -24,9 +24,9 @@ import config
 import llm
 
 # ── Apify actor ───────────────────────────────────────────────────────────────
-# Apify store: https://apify.com/apify/linkedin-post-search-scraper
+# Apify store: https://apify.com/johnvc/linkedin-post-search-api
 # If this actor ID changes, update it here.
-_POSTS_ACTOR_ID = "apify/linkedin-post-search-scraper"
+_POSTS_ACTOR_ID = "johnvc/linkedin-post-search-api"
 
 # Search query templates — {keyword} is substituted at runtime.
 # Two kinds:
@@ -218,9 +218,8 @@ def _run_query(client: Any, query: str, seen_urls: set[str]) -> list[dict[str, A
     logger.info(f"[POSTS] Querying: {query!r}")
     try:
         run = client.actor(_POSTS_ACTOR_ID).call(run_input={
-            "searchQuery": query,
-            "maxResults": _MAX_POSTS_PER_QUERY,
-            "proxy": {"useApifyProxy": True, "apifyProxyGroups": ["RESIDENTIAL"]},
+            "keywords": [query],
+            "maxPostsPerKeyword": _MAX_POSTS_PER_QUERY,
         })
         items = list(client.dataset(run["defaultDatasetId"]).iterate_items())
         fresh = []
@@ -383,7 +382,7 @@ def _extract_jobs_from_posts(
                 "post_url": post_url,
                 "description": extracted.get("description", ""),
                 "source": "linkedin_posts",
-                "posted_date": raw.get("postedAt") or raw.get("date") or "",
+                "posted_date": raw.get("postedAt") or raw.get("date") or raw.get("datePosted") or "",
                 "apply_note": (
                     "DM author on LinkedIn" if not apply_url else ""
                 ),

@@ -1,5 +1,5 @@
 openai>=1.0.0
-apify-client
+apify-client<3
 python-telegram-bot>=20.0
 apscheduler
 gspread
